@@ -1,0 +1,99 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreateActivity"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".CreateActivity"
+        android:orientation="horizontal"
+        android:weightSum="1">
+    <EditText
+        android:layout_width="247dp"
+        android:layout_height="58dp"
+        android:id="@+id/interest_name"
+        android:text="Interest name"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Interests"
+        android:id="@+id/select_interest"
+        android:layout_gravity="right" />
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".CreateActivity"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <EditText
+            android:layout_width="247dp"
+            android:layout_height="58dp"
+            android:id="@+id/activity_address"
+            android:text="Enter address" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search"
+            android:id="@+id/address_search"
+            android:layout_gravity="right" />
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="260dp"
+        tools:context=".CreateActivity"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map_show"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:enabled="true"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            tools:context="com.spotizy.myapp.MapsActivity" />
+
+    </LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".CreateActivity"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <EditText
+            android:layout_width="247dp"
+            android:layout_height="58dp"
+            android:id="@+id/activity_name"
+            android:text="Enter activity name" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create"
+            android:id="@+id/create_activity"
+            android:layout_gravity="right" />
+    </LinearLayout>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools" android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            tools:context=".CreateActivity"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <EditText
+                android:layout_width="254dp"
+                android:layout_height="58dp"
+                android:id="@+id/activity_datetime"
+                android:layout_gravity="left"
+                android:text="Enter date and time" />
+
+
+
+    </LinearLayout>
+</LinearLayout>
