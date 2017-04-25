@@ -1,10 +1,12 @@
 package com.spotizy.myapp;
 
+import org.bson.types.ObjectId;
+
 /**
  * Created by Gautam_Bhuyan on 1/8/2016.
  */
 public class MessageData {
-    private int activityId;
+    private ObjectId activityId;
     private int userId;
     private String message;
 

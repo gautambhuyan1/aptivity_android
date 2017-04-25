@@ -25,8 +25,8 @@ public class ActivityAdaptor extends BaseAdapter implements View.OnClickListener
     }
 
     private class ActivityHolder {
-        public int interestId;
-        public int activityId;
+        public String interestId;
+        public String activityId;
         public double latitude;
         public double longitude;
         public String activityName;
@@ -88,7 +88,7 @@ public class ActivityAdaptor extends BaseAdapter implements View.OnClickListener
         //Intent intent = new Intent(Intent.ACTION_VIEW);
         Intent intent = new Intent(groupActivity.getApplicationContext(), MessageActivity.class);
         //intent.setClass("com.spotizy.chat", "com.spotizy.chat.MessageActivity");
-        intent.putExtra("interestid", a.interestId);
+        intent.putExtra("interest", a.interestId);
         intent.putExtra("activityid", a.activityId);
         intent.putExtra("activityname", a.activityName);
         intent.putExtra("latitude", a.latitude);
@@ -96,6 +96,4 @@ public class ActivityAdaptor extends BaseAdapter implements View.OnClickListener
         this.groupActivity.startActivity(intent);
 
     }
-
-
 }

@@ -27,14 +27,65 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
     }
 
     protected String doInBackground(String... str) {
-        String url = str[0];
-        System.out.println("#### Background Task URL ="+url);
-        System.out.println("#####  in Background");
+        String strURL = "http://10.0.0.4:3030";
+        String method = str[0];
+        String methodName = str[1];
+        String params = str[2];
+        String result = "";
+
+
+        //System.out.println("#### Background Task URL ="+url);
+        System.out.println("#####  in doInBackground "+str[0]+" "+str[1]+" "+str[2]);
         try {
-            String result = ServerDataRetriever.getFromServer(url);
-            System.out.println("#####  doInBackground result = "+result);
+            switch (method) {
+                case "GET": {
+                    //call get method
+                    System.out.println("#####  methodname = "+methodName);
+                    switch (methodName) {
+                        case "interests":
+                            //strURL.concat("/interests");
+                            strURL += "/interests";
+                            break;
+                        case "activities":
+                            //strURL.concat("/activities");
+                            strURL += "/activities/";
+                            System.out.println("#####  Here "+strURL);
+                            break;
+                        case "messages":
+                            //strURL.concat("/messages");
+                            strURL += "/messages/";
+                            break;
+                        default:
+                    }
+
+                    result = ServerDataRetriever.invokeGet(strURL, params);
+                }
+                    break;
+                case "POST": {
+                    //call post method
+                    switch (methodName) {
+                        case "activity":
+                            //strURL.concat("/activity");
+                            strURL += "/activity";
+                            break;
+                        case "message":
+                            //strURL.concat("/message");
+                            strURL += "/message";
+                            break;
+                        default:
+                    }
+
+                    result = ServerDataRetriever.invokePost(strURL, params);
+                }
+                    break;
+                default:
+            }
+            //String result = ServerDataRetriever.getFromServer(method, methodName, url);
+            System.out.println("@@@@ Value = "+result+" Done");
+            System.out.println("@@@@ Value = "+result+" Done");
             return result;
         } catch (Exception e) {
+            System.out.println("Hello world");
             return new String();
         }
     }
@@ -44,8 +95,8 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
 
 
         try {
-            JSONObject respJson = new JSONObject(result);
-            JSONObject jsonObject = respJson.getJSONObject("object");
+            //JSONObject respJson = new JSONObject(result);
+            JSONObject jsonObject = new JSONObject(result);//respJson.getJSONObject("object");
             String type = (String)jsonObject.getString("type");
             if (type.equals("activity")) {
                 ArrayList<ActivityData> activityData = new ArrayList<ActivityData>();
@@ -53,13 +104,15 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
 
                 for (int i = 0; i < groupArray.length(); i++) {
                     JSONObject group = groupArray.getJSONObject(i);
-                    int interestId = Integer.parseInt(group.getString("interestid"));
-                    int activityId = Integer.parseInt(group.getString("activityid"));
-                    double latitude = Double.parseDouble(group.getString("latitude"));
-                    double longitude = Double.parseDouble(group.getString("longitude"));
-                    String activityName = group.getString("name");
-                    activityData.add(new ActivityData(interestId, activityId, latitude, longitude, activityName));
-                    System.out.println(latitude + " " + longitude + " " + activityId + " " + activityName);
+                    String interestId = group.getString("interest");
+                    String activityId = group.getString("activityid");
+                    String activity = group.getString("activity");
+                    JSONArray location = group.getJSONArray("location");
+                    double latitude = location.getDouble(0);
+                    double longitude = location.getDouble(1);
+                    activityData.add(new ActivityData(interestId, activity, latitude, longitude, activity));
+                    //System.out.println(latitude + " " + longitude + " " + activity + " " + activity);
+                    System.out.println("Done here");
                 }
                 ((MainActivity)(this.activity)).setActivities(activityData);
             }
@@ -78,18 +131,18 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                 ((MessageActivity)this.activity).setMessages(msgData);
             }
             else if (type.equals("interest")) {
-                ArrayList<InterestData> interestData = new ArrayList<InterestData>();
-                int interestId;
+                ArrayList<String> interestData = new ArrayList<String>();
+                String interestId;
                 JSONArray interestArray = jsonObject.getJSONArray("interests");
 
                 for (int i = 0; i < interestArray.length(); i++) {
                     JSONObject interest = interestArray.getJSONObject(i);
-                    interestId = Integer.parseInt(interest.getString("interestid"));
-                    String interestName = interest.getString("name");
-                    interestData.add(new InterestData(interestId, interestName));
+                    interestId = interest.getString("interestid");
+                    String interestName = interest.getString("interest");
+                    interestData.add(interestName);
                     System.out.println("#### Message "+interestId+" "+interestName);
                 }
-                ((InterestActivity)this.activity).setInterests(interestData);
+                ((MainActivity)this.activity).setInterests(interestData);
             }
             else if (type.equals("create")) {
                 ArrayList<InterestData> interestData = new ArrayList<InterestData>();
@@ -103,5 +156,6 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
         }
 
         //this.activity.setGroups(groupData);
+
     }
 }

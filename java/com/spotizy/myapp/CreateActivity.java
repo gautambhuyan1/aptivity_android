@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-//import android.support.v7.app.AppCompactActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
@@ -20,9 +19,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.net.URLEncoder;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+
+//import android.support.v7.app.AppCompactActivity;
 
 
 public class CreateActivity extends ActionBarActivity implements OnMapReadyCallback {
@@ -44,7 +45,8 @@ public class CreateActivity extends ActionBarActivity implements OnMapReadyCallb
     private EditText activityAddress;
     private EditText activityName;
     private EditText activityDateTime;
-    private int interestId;
+    private EditText interestName;
+    private String interestId;
     private double latitude;
     private double longitude;
     private GoogleMap mMap;
@@ -57,7 +59,7 @@ public class CreateActivity extends ActionBarActivity implements OnMapReadyCallb
         context = this.getApplicationContext();
         Intent triggerData = this.getIntent();
         if (triggerData != null) {
-            this.interestId = triggerData.getIntExtra("interestid", 0);
+            this.interestId = triggerData.getStringExtra("interest");
             System.out.println("##### Interest ID is"+this.interestId);
         }
         else {
@@ -68,6 +70,7 @@ public class CreateActivity extends ActionBarActivity implements OnMapReadyCallb
         searchAddress = (Button)this.findViewById(R.id.address_search);
         activityAddress = (EditText)this.findViewById(R.id.activity_address);
         activityName = (EditText)this.findViewById(R.id.activity_name);
+        interestName = (EditText)this.findViewById(R.id.interest_name);
         activityDateTime = (EditText)this.findViewById(R.id.activity_datetime);
         //interestId = getIntent().getIntExtra("interestId", 0);
         //activityName.setText(activityNameStr);
@@ -90,15 +93,6 @@ public class CreateActivity extends ActionBarActivity implements OnMapReadyCallb
             longitude = tracker.getLongitude();
             System.out.println("#### Found location latitude = "+latitude+" longitude = "+longitude);
         }
-
-        showInterestList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), InterestActivity.class);
-
-                startActivityForResult(intent, 0);
-            }
-        });
 
         searchAddress.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,19 +122,20 @@ public class CreateActivity extends ActionBarActivity implements OnMapReadyCallb
             public void onClick(View v) {
                 String name = activityName.getText().toString();
                 String dateAndTime = activityDateTime.getText().toString();
+                String interest = interestName.getText().toString();
+                LinkedHashMap<String,String> postParams=new LinkedHashMap<>();
+                postParams.put("interest", interest);
+                postParams.put("activity", name);
+                postParams.put("lat", Double.toString(latitude));
+                postParams.put("lng", Double.toString(longitude));
+
                 WebApiDataTask webDataFetcher = new WebApiDataTask(CreateActivity.this);
                 try {
-                    name = URLEncoder.encode("\""+name+"\"", "utf-8");
-                    dateAndTime = URLEncoder.encode("\""+dateAndTime+"\"", "utf-8");
-                    System.out.println("#####  In CreateActivity");
-                    //String urlTmp = URLEncoder.encode("\"" + msg + "\"", "utf-8");
-                    //System.out.println("#####  URL 1: "+urlTmp);
-                    String url = "http://hospitopedia.com/activity/create?interestid="+interestId+"&name="+name+"&lat="+latitude+"&long="+longitude+"&datetime="+dateAndTime;
 
-                    System.out.println("##### URL for CREATE = "+url);
-                    //String urlTmp = URLEncoder.encode(url, "utf-8");
-                    //System.out.println("#### Create activity url = "+urlTmp);
-                    webDataFetcher.execute(url);
+                    //check whether the msg empty or not
+
+                    String postURL = ServerDataRetriever.createPostURL(postParams);
+                    webDataFetcher.execute("POST", "activity", postURL);
                 } catch (Exception e) {
                     webDataFetcher.cancel(true);
                 }
@@ -151,12 +146,13 @@ public class CreateActivity extends ActionBarActivity implements OnMapReadyCallb
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        interestId = data.getIntExtra("interestid", 0);
+        interestId = data.getStringExtra("interest");
 
         System.out.println("#### onActivityResult::InterestId = "+interestId);
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;

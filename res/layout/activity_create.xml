@@ -24,25 +24,7 @@
         android:id="@+id/select_interest"
         android:layout_gravity="right" />
     </LinearLayout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context=".CreateActivity"
-        android:orientation="horizontal"
-        android:weightSum="1">
-        <EditText
-            android:layout_width="247dp"
-            android:layout_height="58dp"
-            android:id="@+id/activity_address"
-            android:text="Enter address" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Search"
-            android:id="@+id/address_search"
-            android:layout_gravity="right" />
-    </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:layout_height="260dp"
@@ -58,7 +40,27 @@
             android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="260dp"
-            tools:context="com.spotizy.myapp.MapsActivity" />
+            tools:context="com.spotizy.myapp.MapsActivity" >
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".CreateActivity"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <EditText
+                android:layout_width="247dp"
+                android:layout_height="58dp"
+                android:id="@+id/activity_address"
+                android:text="Enter address" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Search"
+                android:id="@+id/address_search"
+                android:layout_gravity="right" />
+        </LinearLayout>
+        </fragment>
 
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

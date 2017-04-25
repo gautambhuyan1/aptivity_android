@@ -8,19 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-
-import android.widget.TextView;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
+import java.util.LinkedHashMap;
 
 public class MessageActivity extends ActionBarActivity implements OnMapReadyCallback {
 
@@ -32,8 +31,8 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
     private EditText message_content;
     private Button sendBtn;
     private Button createActivity;
-    private int activityId;
-    private int interestId;
+    private String activityId;
+    private String interestId;
     private double latitude;
     private double longitude;
     private Intent intent;
@@ -47,8 +46,8 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
         setContentView(R.layout.activity_detail);
         Intent triggerData = this.getIntent();
         if (triggerData != null) {
-            this.activityId = triggerData.getIntExtra("activityid", 0);
-            this.interestId = triggerData.getIntExtra("interestid", 0);
+            this.activityId = triggerData.getStringExtra("activityid");
+            this.interestId = triggerData.getStringExtra("interestid");
         }
         else {
             System.out.println("##### No intent data");
@@ -60,7 +59,7 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
         msgList = (ListView)this.findViewById(R.id.message_list);
         this.layoutIflator = LayoutInflater.from(this);
         intent = getIntent();
-        activityId = intent.getIntExtra("activityid", 0);
+        activityId = intent.getStringExtra("activityid");
         activityNameStr = intent.getStringExtra("activityname");
         latitude = intent.getDoubleExtra("latitude", 100);
         longitude = intent.getDoubleExtra("longitude", 100);
@@ -77,9 +76,12 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
 
         WebApiDataTask webDataFetcher = new WebApiDataTask(MessageActivity.this);
         try {
-            String url = "http://hospitopedia.com/message/get?activityid="+activityId+"&phone=%221234%22";
+            //String url = "http://hospitopedia.com/message/get?activityid="+activityId+"&phone=%221234%22";
             //System.out.println("#### Messages: Onclick url = "+url);
-            webDataFetcher.execute(url);
+            LinkedHashMap<String,String> getParams=new LinkedHashMap<>();
+            getParams.put("activity", activityId);
+            String getURL = ServerDataRetriever.createGetURL(getParams);
+            webDataFetcher.execute("GET", "messages", getURL);
         } catch (Exception e) {
             webDataFetcher.cancel(true);
         }
@@ -89,7 +91,7 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
             public void onClick(View v) {
                 System.out.println("#### Entering activity create");
                 Intent intent = new Intent(getApplicationContext(), CreateActivity.class);
-                intent.putExtra("interestid", interestId);
+                intent.putExtra("interest", interestId);
                 startActivity(intent);
             }
         });
@@ -105,8 +107,13 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
                     String urlTmp = URLEncoder.encode("\"" + msg + "\"", "utf-8");
                     System.out.println("#####  URL 1: "+urlTmp);
                     String url = "http://hospitopedia.com/message/create?phone=%221234%22&activityid="+activityId+"&msg="+urlTmp;
+                    LinkedHashMap<String,String> postParams=new LinkedHashMap<>();
+                    postParams.put("activity", activityId);
+                    postParams.put("message", msg);
+                    String postURL = ServerDataRetriever.createPostURL(postParams);
+
                     //System.out.println("#### Messages: Onclick url = "+url);
-                    webDataFetcher.execute(url);
+                    webDataFetcher.execute("POST", "message", postURL);
                 } catch (Exception e) {
                     webDataFetcher.cancel(true);
                 }

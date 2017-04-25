@@ -4,13 +4,13 @@ package com.spotizy.myapp;
  * Created by Gautam_Bhuyan on 1/20/2016.
  */
 public class ActivityData {
-    private int interestId;
-    private int activityId;
+    private String interestId;
+    private String activityId;
     private double latitude;
     private double longitude;
     private String name;
 
-    public ActivityData (int interestId, int activityId, double latitude, double longitude, String name) {
+    public ActivityData (String interestId, String activityId, double latitude, double longitude, String name) {
         this.interestId = interestId;
         this.activityId = activityId;
         this.latitude = latitude;
@@ -18,11 +18,11 @@ public class ActivityData {
         this.name = new String(name);
     }
 
-    public int getInterestId() {
+    public String getInterestId() {
         return this.interestId;
     }
 
-    public int getActivityId() {
+    public String getActivityId() {
         return this.activityId;
     }
 
