@@ -94,6 +94,5 @@ public class ActivityAdaptor extends BaseAdapter implements View.OnClickListener
         intent.putExtra("latitude", a.latitude);
         intent.putExtra("longitude", a.longitude);
         this.groupActivity.startActivity(intent);
-
     }
 }

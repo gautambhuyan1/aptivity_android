@@ -1,12 +1,10 @@
 package com.spotizy.myapp;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ public class MessageAdaptor extends BaseAdapter implements View.OnClickListener 
     }
 
     private class MessageHolder {
-        public int userId;
+        public String userId;
         public String message;
         TextView userArea;
         TextView messageArea;
@@ -71,7 +69,7 @@ public class MessageAdaptor extends BaseAdapter implements View.OnClickListener 
         MessageData  this_message = messages.get(pos);
         mHolder.userId = this_message.getUserId();
         mHolder.message = new String(this_message.getMessage());
-        mHolder.userArea.setText(Integer.toString(mHolder.userId));
+        mHolder.userArea.setText(mHolder.userId);
         mHolder.messageArea.setText(mHolder.message);
 
         System.out.println("##### Message ="+mHolder.userId+" "+mHolder.message);

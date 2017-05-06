@@ -11,18 +11,11 @@
         tools:context=".CreateActivity"
         android:orientation="horizontal"
         android:weightSum="1">
-    <EditText
-        android:layout_width="247dp"
-        android:layout_height="58dp"
-        android:id="@+id/interest_name"
-        android:text="Interest name"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Interests"
-        android:id="@+id/select_interest"
-        android:layout_gravity="right" />
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:id="@+id/interest_selection" />
     </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -47,18 +40,15 @@
             tools:context=".CreateActivity"
             android:orientation="horizontal"
             android:weightSum="1">
-            <EditText
-                android:layout_width="247dp"
-                android:layout_height="58dp"
-                android:id="@+id/activity_address"
-                android:text="Enter address" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Search"
-                android:id="@+id/address_search"
-                android:layout_gravity="right" />
+                <fragment
+                    android:id="@+id/activity_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_marginTop="30dp"
+                    android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment" />
+
         </LinearLayout>
         </fragment>
 
@@ -73,13 +63,15 @@
             android:layout_width="247dp"
             android:layout_height="58dp"
             android:id="@+id/activity_name"
-            android:text="Enter activity name" />
+            android:hint="activity name" />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
             android:text="Create"
             android:id="@+id/create_activity"
+            android:textColor="#fff"
+            android:background="#85a5ff"
             android:layout_gravity="right" />
     </LinearLayout>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -88,14 +80,20 @@
             tools:context=".CreateActivity"
             android:orientation="horizontal"
             android:weightSum="1">
-            <EditText
-                android:layout_width="254dp"
-                android:layout_height="58dp"
-                android:id="@+id/activity_datetime"
-                android:layout_gravity="left"
-                android:text="Enter date and time" />
-
-
+            <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:fillViewport="true" >
+            </ScrollView>
+            <Button
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:textColor="#fff"
+                android:background="#85a5ff"
+                android:layout_gravity="right"
+                android:text="when"
+                android:onClick="showDatePickerDialog" />
 
     </LinearLayout>
 </LinearLayout>

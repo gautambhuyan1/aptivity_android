@@ -18,12 +18,13 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/activity_name"
             android:layout_weight="1.09" />
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/activity_date"
+            android:layout_weight="1.09" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New"
-            android:id="@+id/create_activity" />
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
@@ -53,13 +54,17 @@
             android:layout_width="298dp"
             android:layout_height="58dp"
             android:id="@+id/message_content"
-            android:text="Message to send" />
+            android:windowSoftInputMode="stateHidden"
+            android:hint="Comment" />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
             android:text="Send"
             android:id="@+id/send_message"
+            android:textColor="#fff"
+            android:background="#85a5ff"
+            android:layout_marginRight="20dp"
             android:layout_gravity="right" />
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

@@ -1,5 +1,6 @@
 package com.spotizy.myapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -9,9 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,26 +32,28 @@ import java.util.LinkedHashMap;
 import java.util.ListIterator;
 
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, PlaceSelectionListener  {
 
     private static final int MY_PERMISSION_ACCESS_COURSE_LOCATION = 1;
+    private Context context;
     private ArrayList<ActivityData> activities;
     private Spinner interestList;
-    //private LayoutInflater layoutIflator;
-    //private ListView interestList;
-    private Button showInterestList;
-    private Button createActivity;
-    private Button refreshActivities;
+    //private Button showInterestList;
+    private ImageButton createActivity;
+
     private double latitude;
     private double longitude;
     private GoogleMap mMap;
     SupportMapFragment mapFragment;
     private ArrayList<String> interests;
-    //private ListView interestList;
-    //private Button cancelBtn;
-    private String interestId;
-    //private EditText debugInfo;
-    //private WebView webView;
+    private TextView mPlaceDetailsText;
+
+    private TextView mPlaceAttribution;
+
+    private String interestSelected;
+    private PlaceAutocompleteFragment autocompleteFragment;
+
+
 
     @Override
 
@@ -54,11 +62,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //showInterestList = (Button)this.findViewById(R.id.interest_cancel);
-        createActivity = (Button)this.findViewById(R.id.create_activity);
+        createActivity = (ImageButton) this.findViewById(R.id.create_activity);
+        //activityAddress = (EditText)this.findViewById(R.id.address);
+        //searchAddress = (Button)this.findViewById(R.id.search);
         //refreshActivities = (Button)this.findViewById(R.id.refresh_activities);
         interestList = (Spinner) this.findViewById(R.id.interest_list);
         //debugInfo = (EditText)this.findViewById(R.id.debug_info);
         //this.layoutIflator = LayoutInflater.from(this);
+        context = this.getApplicationContext();
+
+        autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Register a listener to receive callbacks when a place has been selected or an error has
+        // occurred.
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+
+        // Retrieve the TextViews that will display details about the selected place.
+        //mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
+        //mPlaceAttribution = (TextView) findViewById(R.id.place_attribution);
+
+        interestSelected = "all";
 
         if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
 
@@ -109,29 +133,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //interestDataFetcher.cancel(true);
         }
         //startActivityForResult(intent, 0);
-        WebApiDataTask webDataFetcher = new WebApiDataTask(MainActivity.this);
-        try {
-            LinkedHashMap<String,String> getParams=new LinkedHashMap<>();
-            getParams.put("interest", "all");
-            getParams.put("lat", Double.toString(latitude));
-            getParams.put("lng", Double.toString(longitude));
+        getActivitiesOnInterest("all");
+/*
+        searchAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-            //check whether the msg empty or not
+                String address = activityAddress.getText().toString();
+                List<Address> addressList = null;
+                Geocoder geoCoder = new Geocoder(context, Locale.getDefault());
+                try {
+                    addressList = geoCoder.getFromLocationName(address, 1);
+                }
+                catch (Exception e) {
 
-            String getURL = ServerDataRetriever.createGetURL(getParams);
-            //webDataFetcher.execute("http://hospitopedia.com/activity/get?interestid=0&phone=%221234%22&lat="+latitude+"&long="+longitude);
+                }
+                Address myAddress = addressList.get(0);
+                latitude = myAddress.getLatitude();
+                longitude = myAddress.getLongitude();
+                LatLng location = new LatLng(latitude, longitude);
+                mMap.addMarker(new MarkerOptions().position(location).title("Marker in location"));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12));
 
-            webDataFetcher.execute("GET", "activities", getURL);
-        } catch (Exception e) {
-            webDataFetcher.cancel(true);
-        }
-
+                getActivitiesOnInterest(interestSelected);
+            }
+        });
+*/
         interestList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
 
-                String interestSelected = interestList.getSelectedItem().toString();
+                interestSelected = interestList.getSelectedItem().toString();
                 getActivitiesOnInterest(interestSelected);
 
             }
@@ -148,13 +182,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         createActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int resultCode = 0;
                 Intent intent = new Intent(getApplicationContext(), CreateActivity.class);
-                intent.putExtra("interestid", 0);
-                startActivity(intent);
+                //intent.putExtra("interestid", 0);
+                intent.putExtra("interests", interests);
+                startActivityForResult(intent, resultCode);
             }
         });
     }
 
+    @Override
+    public void onPlaceSelected(Place place) {
+
+        latitude = place.getLatLng().latitude;
+        longitude = place.getLatLng().longitude;
+        LatLng location = new LatLng(latitude, longitude);
+        mMap.addMarker(new MarkerOptions().position(location).title("Marker in location"));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12));
+
+        getActivitiesOnInterest(interestSelected);
+
+/*
+        // Format the returned place's details and display them in the TextView.
+        mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
+                place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
+
+        CharSequence attributions = place.getAttributions();
+        if (!TextUtils.isEmpty(attributions)) {
+            mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
+        } else {
+            mPlaceAttribution.setText("");
+        }
+        */
+    }
 
     public void setActivities(ArrayList<ActivityData> activities) {
 
@@ -167,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng activityLocation = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(activityLocation).title("My location"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(activityLocation));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(activityLocation, 12));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(activityLocation, 10));
         if ((ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             mMap.setMyLocationEnabled(true);
@@ -176,7 +237,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             item = li.next();
             activityLocation = new LatLng(item.getLatitude(), item.getLongitude());
             Marker marker = mMap.addMarker(new MarkerOptions().position(activityLocation).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).title(item.getActivityName()));
+            //marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.icon));
             marker.setTag(item);
+            marker.showInfoWindow();
         }
     }
 
@@ -238,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng activityLocation = new LatLng(latitude, longitude);
         mMap.addMarker(new MarkerOptions().position(activityLocation).title("My location"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(activityLocation));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(activityLocation, 12));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(activityLocation, 10));
         if ((ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             mMap.setMyLocationEnabled(true);
@@ -260,14 +323,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ActivityData item = (ActivityData)marker.getTag();
         if (item != null) {
             Intent intent = new Intent(this.getApplicationContext(), MessageActivity.class);
-            //intent.setClass("com.spotizy.chat", "com.spotizy.chat.MessageActivity");
+
             intent.putExtra("interest", item.getInterestId());
             intent.putExtra("activityid", item.getActivityId());
             intent.putExtra("activityname", item.getActivityName());
             intent.putExtra("latitude", item.getLatitude());
             intent.putExtra("longitude", item.getLongitude());
+            intent.putExtra("date", item.getDate());
             this.startActivity(intent);
         }
         return false;
+    }
+    @Override
+    public void onError(Status status) {
+        System.out.println("Error hit");
     }
 }

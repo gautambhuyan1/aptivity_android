@@ -27,7 +27,8 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
     }
 
     protected String doInBackground(String... str) {
-        String strURL = "http://10.0.0.4:3030";
+        String strURL = "https://gautambhuyan.herokuapp.com";
+        //String strURL = "http://10.0.0.4:5000";
         String method = str[0];
         String methodName = str[1];
         String params = str[2];
@@ -107,10 +108,11 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                     String interestId = group.getString("interest");
                     String activityId = group.getString("activityid");
                     String activity = group.getString("activity");
+                    String date = group.getString("date");
                     JSONArray location = group.getJSONArray("location");
                     double latitude = location.getDouble(0);
                     double longitude = location.getDouble(1);
-                    activityData.add(new ActivityData(interestId, activity, latitude, longitude, activity));
+                    activityData.add(new ActivityData(interestId, activityId, latitude, longitude, activity, date));
                     //System.out.println(latitude + " " + longitude + " " + activity + " " + activity);
                     System.out.println("Done here");
                 }
@@ -118,12 +120,12 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
             }
             else if (type.equals("messages")) {
                 ArrayList<MessageData> msgData = new ArrayList<MessageData>();
-                int activityId = Integer.parseInt(jsonObject.getString("activityid"));
+                String activityId = jsonObject.getString("activityid");
                 JSONArray messageArray = jsonObject.getJSONArray("messages");
 
                 for (int i = 0; i < messageArray.length(); i++) {
                     JSONObject message = messageArray.getJSONObject(i);
-                    int userId = Integer.parseInt(message.getString("userid"));
+                    String userId = message.getString("userid");
                     String msg = message.getString("message");
                     msgData.add(new MessageData(userId, msg));
                     System.out.println("#### Message "+userId+" "+msg);

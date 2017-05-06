@@ -2,9 +2,10 @@ package com.spotizy.myapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -21,22 +22,24 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class MessageActivity extends ActionBarActivity implements OnMapReadyCallback {
+public class MessageActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private ArrayList<MessageData> messages;
     private ListView msgList;
     private LayoutInflater layoutIflator;
     private TextView activityName;
+    private TextView activityDate;
     private String activityNameStr;
     private EditText message_content;
     private Button sendBtn;
-    private Button createActivity;
+    //private Button createActivity;
     private String activityId;
     private String interestId;
     private double latitude;
     private double longitude;
     private Intent intent;
     private GoogleMap mMap;
+    private String date;
     //private WebView webView;
 
     @Override
@@ -52,10 +55,11 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
         else {
             System.out.println("##### No intent data");
         }
-        createActivity = (Button)this.findViewById(R.id.create_activity);
+        //createActivity = (Button)this.findViewById(R.id.create_activity);
         sendBtn = (Button)this.findViewById(R.id.send_message);
         message_content = (EditText)this.findViewById(R.id.message_content);
         activityName = (TextView)this.findViewById(R.id.activity_name);
+        activityDate = (TextView)this.findViewById(R.id.activity_date);
         msgList = (ListView)this.findViewById(R.id.message_list);
         this.layoutIflator = LayoutInflater.from(this);
         intent = getIntent();
@@ -63,7 +67,7 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
         activityNameStr = intent.getStringExtra("activityname");
         latitude = intent.getDoubleExtra("latitude", 100);
         longitude = intent.getDoubleExtra("longitude", 100);
-
+        date = intent.getStringExtra("date");
         System.out.println("#### INSIDE Activity latlong "+latitude+" "+longitude);
         activityName.setText(activityNameStr);
 
@@ -86,17 +90,6 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
             webDataFetcher.cancel(true);
         }
 
-        createActivity.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                System.out.println("#### Entering activity create");
-                Intent intent = new Intent(getApplicationContext(), CreateActivity.class);
-                intent.putExtra("interest", interestId);
-                startActivity(intent);
-            }
-        });
-
-
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,7 +99,6 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
                     System.out.println("#####  URL : "+msg);
                     String urlTmp = URLEncoder.encode("\"" + msg + "\"", "utf-8");
                     System.out.println("#####  URL 1: "+urlTmp);
-                    String url = "http://hospitopedia.com/message/create?phone=%221234%22&activityid="+activityId+"&msg="+urlTmp;
                     LinkedHashMap<String,String> postParams=new LinkedHashMap<>();
                     postParams.put("activity", activityId);
                     postParams.put("message", msg);
@@ -117,9 +109,21 @@ public class MessageActivity extends ActionBarActivity implements OnMapReadyCall
                 } catch (Exception e) {
                     webDataFetcher.cancel(true);
                 }
+                WebApiDataTask messageDataFetcher = new WebApiDataTask(MessageActivity.this);
+                try {
+                    //String url = "http://hospitopedia.com/message/get?activityid="+activityId+"&phone=%221234%22";
+                    //System.out.println("#### Messages: Onclick url = "+url);
+                    LinkedHashMap<String,String> getParams=new LinkedHashMap<>();
+                    getParams.put("activity", activityId);
+                    String getURL = ServerDataRetriever.createGetURL(getParams);
+                    messageDataFetcher.execute("GET", "messages", getURL);
+                } catch (Exception e) {
+                    webDataFetcher.cancel(true);
+                }
+
             }
         });
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     @Override

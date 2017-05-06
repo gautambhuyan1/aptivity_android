@@ -6,6 +6,13 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="dialogTheme">@style/dialogTheme</item>
     </style>
+    <style name="dialogTheme" parent="Theme.AppCompat.Light.Dialog">
 
+        <!-- Put the two options, colorAccent and android:colorAccent. -->
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    </style>
 </resources>

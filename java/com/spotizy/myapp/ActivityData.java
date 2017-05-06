@@ -6,16 +6,18 @@ package com.spotizy.myapp;
 public class ActivityData {
     private String interestId;
     private String activityId;
+    private String date;
     private double latitude;
     private double longitude;
     private String name;
 
-    public ActivityData (String interestId, String activityId, double latitude, double longitude, String name) {
+    public ActivityData (String interestId, String activityId, double latitude, double longitude, String name, String date) {
         this.interestId = interestId;
         this.activityId = activityId;
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = new String(name);
+        this.date = new String(date);
     }
 
     public String getInterestId() {
@@ -37,4 +39,6 @@ public class ActivityData {
     public String getActivityName() {
         return this.name;
     }
+
+    public String getDate() {return this.date;}
 }
