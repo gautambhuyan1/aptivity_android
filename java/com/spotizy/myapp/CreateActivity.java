@@ -29,6 +29,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
@@ -54,6 +57,8 @@ public class CreateActivity extends AppCompatActivity implements OnMapReadyCallb
     private ArrayList<String> interests;
     private PlaceAutocompleteFragment autocompleteFragment;
     private static String date;
+    private String userid;
+    private String username;
 
 
     @Override
@@ -61,6 +66,7 @@ public class CreateActivity extends AppCompatActivity implements OnMapReadyCallb
         System.out.println("#####  In Create Activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
+        getUserContext();
         context = this.getApplicationContext();
         Intent triggerData = this.getIntent();
         if (triggerData != null) {
@@ -127,19 +133,27 @@ public class CreateActivity extends AppCompatActivity implements OnMapReadyCallb
                 String name = activityName.getText().toString();
                 String dateAndTime = date;//activityDateTime.getText().toString();
                 String interest = interestSelected;
-                LinkedHashMap<String, String> postParams = new LinkedHashMap<>();
-                postParams.put("interest", interest);
-                postParams.put("activity", name);
-                postParams.put("lat", Double.toString(latitude));
-                postParams.put("lng", Double.toString(longitude));
-                postParams.put("date", dateAndTime);
+                //LinkedHashMap<String, String> postParams = new LinkedHashMap<>();
+                JSONObject postParams = new JSONObject();
+                try {
+                    postParams.put("userid", userid);
+                    postParams.put("username", username);
+                    postParams.put("interest", interest);
+                    postParams.put("activity", name);
+                    postParams.put("lat", Double.toString(latitude));
+                    postParams.put("lng", Double.toString(longitude));
+                    postParams.put("date", dateAndTime);
+
+                } catch (JSONException e) {
+                    System.out.println("Error in JSON");
+                }
 
                 WebApiDataTask webDataFetcher = new WebApiDataTask(CreateActivity.this);
                 try {
 
                     //check whether the msg empty or not
 
-                    String postURL = ServerDataRetriever.createPostURL(postParams);
+                    String postURL = postParams.toString();//ServerDataRetriever.createPostURL(postParams);
                     webDataFetcher.execute("POST", "activity", postURL);
                 } catch (Exception e) {
                     webDataFetcher.cancel(true);
@@ -227,5 +241,10 @@ public class CreateActivity extends AppCompatActivity implements OnMapReadyCallb
 
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(fragmentManager, "datePicker");
+    }
+
+    private void getUserContext() {
+        username = UserCredentials.getUserName();
+        userid = UserCredentials.getUserId();
     }
 }

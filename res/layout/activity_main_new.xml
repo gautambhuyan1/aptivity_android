@@ -1,48 +1,65 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity"
-        android:orientation="horizontal"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_show"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:enabled="true"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.spotizy.myapp.MainActivity" >
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:weightSum="1">
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map_show1"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:enabled="true"
-        android:clickable="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.spotizy.myapp.MainActivity" >
         <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card_view1"
+            android:id="@+id/card_view"
             android:layout_gravity="top"
-            android:layout_margin="5dp"
-            android:layout_width="200dp"
-            android:layout_height="40dp">
+            android:layout_margin="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="1dp">
             <fragment
-                android:id="@+id/autocomplete_fragment1"
+                android:id="@+id/activity_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment" />
         </android.support.v7.widget.CardView>
 
+        <EditText
+            android:layout_width="247dp"
+            android:layout_height="58dp"
+            android:id="@+id/activity_name"
+            android:layout_alignBottom="@id/card_view"
+            android:hint="activity name" />
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/interest_list1" />
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="right|bottom"
-        android:src="@drawable/create"
-        android:padding="10dp"
-        android:layout_marginBottom="20dp"
-        android:paddingRight="10dp"
-        android:text="New"
-        android:id="@+id/create_activity1" />
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/activity_name"
+            android:layout_toRightOf="@id/activity_name"
+            android:id="@+id/interest_selection" />
+
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:text="Create"
+            android:layout_below="@id/interest_selection"
+            android:id="@+id/create_activity"
+            android:textColor="#fff"
+            android:background="#85a5ff"
+            android:layout_gravity="right" />
+
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:textColor="#fff"
+            android:layout_below="@id/create_activity"
+            android:background="#85a5ff"
+            android:layout_gravity="right"
+            android:text="when"
+            android:onClick="showDatePickerDialog" />
+
+    </RelativeLayout>
 </fragment>
-</RelativeLayout>

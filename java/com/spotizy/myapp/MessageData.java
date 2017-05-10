@@ -5,16 +5,16 @@ package com.spotizy.myapp;
  */
 public class MessageData {
     private String activityId;
-    private String userId;
+    private String username;
     private String message;
 
-    public MessageData(String userId, String msg) {
-        this.userId = userId;
+    public MessageData(String username, String msg) {
+        this.username = username;
         this.message = new String(msg);
     }
 
-    public String getUserId() {
-        return this.userId;
+    public String getUserName() {
+        return this.username;
     }
 
     public String getMessage() {

@@ -65,11 +65,15 @@ public class ServerDataRetriever {
 
     public  static synchronized String invokePost(String strURL, String params) {
         //check whether the msg empty or not
+        String retVal = "";
+        byte[] buf = new byte[1024];
 
         try {
             URL url = new URL(strURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Accept", "application/json");
             conn.setDoInput(true);
             conn.setDoOutput(true);
 
@@ -83,14 +87,30 @@ public class ServerDataRetriever {
 
             int responseCode = conn.getResponseCode();
             conn.disconnect();
-            if (responseCode == HttpURLConnection.HTTP_OK)
-                return "success";
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream ist = new BufferedInputStream(conn.getInputStream());
+                //ByteArrayOutputStream out = new ByteArrayOutputStream();
+                int readcnt = 0;
+                int strlen = 0;
+                while ((readcnt = ist.read(buf)) != -1) {
+                    System.out.println("#####  Count = "+readcnt);
+                    strlen += readcnt;
+                    //out.write(buf, 0, readcnt);
+                }
+                if (strlen >= 0) {
+                    buf[strlen] = '\0';
+                }
+                retVal = new String(buf, 0, strlen);
+                System.out.println("#### returned bytes "+retVal+" "+retVal.length());
+                return retVal;
+            }
+
             else
                 return "";
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "";
+            return "";
     }
 
     public  static synchronized String invokeGet(String strURL, String params) {

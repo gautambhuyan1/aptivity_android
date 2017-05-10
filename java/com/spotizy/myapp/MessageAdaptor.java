@@ -67,7 +67,7 @@ public class MessageAdaptor extends BaseAdapter implements View.OnClickListener 
         //gHolder.selectedGroup.setOnClickListener(this);
 
         MessageData  this_message = messages.get(pos);
-        mHolder.userId = this_message.getUserId();
+        mHolder.userId = this_message.getUserName();
         mHolder.message = new String(this_message.getMessage());
         mHolder.userArea.setText(mHolder.userId);
         mHolder.messageArea.setText(mHolder.message);

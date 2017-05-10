@@ -3,16 +3,25 @@ package com.spotizy.myapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
@@ -27,6 +36,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.ListIterator;
@@ -40,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Spinner interestList;
     //private Button showInterestList;
     private ImageButton createActivity;
+    private Button createUser;
 
     private double latitude;
     private double longitude;
@@ -53,6 +66,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String interestSelected;
     private PlaceAutocompleteFragment autocompleteFragment;
 
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mAdapter;
+
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private String mActivityTitle;
+    private String username;
+    private String userid;
 
 
     @Override
@@ -61,15 +82,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("#####  Before Main");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setUserContext();
+        getUserContext();
+
         //showInterestList = (Button)this.findViewById(R.id.interest_cancel);
         createActivity = (ImageButton) this.findViewById(R.id.create_activity);
+        createUser = (Button) this.findViewById(R.id.create_user);
+
         //activityAddress = (EditText)this.findViewById(R.id.address);
         //searchAddress = (Button)this.findViewById(R.id.search);
         //refreshActivities = (Button)this.findViewById(R.id.refresh_activities);
         interestList = (Spinner) this.findViewById(R.id.interest_list);
+
+        mActivityTitle = getTitle().toString();
         //debugInfo = (EditText)this.findViewById(R.id.debug_info);
         //this.layoutIflator = LayoutInflater.from(this);
         context = this.getApplicationContext();
+
+        mDrawerList = (ListView)findViewById(R.id.options_list);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mActivityTitle = getTitle().toString();
+
+        addDrawerItems();
+        setupDrawer();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -178,6 +216,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         });
 
+        createUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //LinkedHashMap<String, String> postParams = new LinkedHashMap<>();
+                JSONObject postParams = new JSONObject();
+                try {
+                    postParams.put("username", "Nandy");
+                    postParams.put("imsi", "+1123456789");
+
+                } catch (JSONException e) {
+                    System.out.println("Error in JSON");
+                }
+
+                WebApiDataTask webDataFetcher = new WebApiDataTask(MainActivity.this);
+                try {
+
+                    //check whether the msg empty or not
+
+                    String postURL = postParams.toString();//ServerDataRetriever.createPostURL(postParams);
+                    webDataFetcher.execute("POST", "user", postURL);
+                } catch (Exception e) {
+                    webDataFetcher.cancel(true);
+                }
+                //finish();
+
+            }
+        });
+
 
         createActivity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,6 +254,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //intent.putExtra("interestid", 0);
                 intent.putExtra("interests", interests);
                 startActivityForResult(intent, resultCode);
+            }
+        });
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "Time for an upgrade!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -251,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         try {
             //webDataFetcher.execute("http://hospitopedia.com/activity/get?interestid="+interestId+"&phone=%221234%22&lat="+latitude+"&long="+longitude);
             LinkedHashMap<String,String> getParams=new LinkedHashMap<>();
+            getParams.put("userid", userid);
             getParams.put("interest", interestId);
             getParams.put("lat", Double.toString(latitude));
             getParams.put("lng", Double.toString(longitude));
@@ -318,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ArrayAdapter<String> adaptor = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, interestArray);
         interestList.setAdapter(adaptor);
     }
+
     @Override
     public boolean onMarkerClick(final Marker marker) {
         ActivityData item = (ActivityData)marker.getTag();
@@ -337,5 +413,84 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onError(Status status) {
         System.out.println("Error hit");
+    }
+
+    private void addDrawerItems() {
+        String[] osArray = { "User details", "Interests", "Activities"};
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
+        mDrawerList.setAdapter(mAdapter);
+    }
+
+    private void setupDrawer() {
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                //getSupportActionBar().setTitle("Navigation!");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                //getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        // Activate the navigation drawer toggle
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setUserContext() {
+        UserCredentials.setUserId("thisisme");
+        UserCredentials.setIMSI("123456");
+        UserCredentials.setName("Aptivity user");
+    }
+
+    private void getUserContext() {
+        username = UserCredentials.getUserName();
+        userid = UserCredentials.getUserId();
     }
 }

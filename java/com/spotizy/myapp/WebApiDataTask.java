@@ -28,7 +28,7 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
 
     protected String doInBackground(String... str) {
         String strURL = "https://gautambhuyan.herokuapp.com";
-        //String strURL = "http://10.0.0.4:5000";
+        //String strURL = "http://10.10.10.219:5000";
         String method = str[0];
         String methodName = str[1];
         String params = str[2];
@@ -73,6 +73,10 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                             //strURL.concat("/message");
                             strURL += "/message";
                             break;
+                        case "user":
+                            //strURL.concat("/message");
+                            strURL += "/user";
+                            break;
                         default:
                     }
 
@@ -106,13 +110,15 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                 for (int i = 0; i < groupArray.length(); i++) {
                     JSONObject group = groupArray.getJSONObject(i);
                     String interestId = group.getString("interest");
+                    String userid = group.getString("userid");
+                    String username = group.getString("username");
                     String activityId = group.getString("activityid");
                     String activity = group.getString("activity");
                     String date = group.getString("date");
                     JSONArray location = group.getJSONArray("location");
                     double latitude = location.getDouble(0);
                     double longitude = location.getDouble(1);
-                    activityData.add(new ActivityData(interestId, activityId, latitude, longitude, activity, date));
+                    activityData.add(new ActivityData(interestId, userid, username, activityId, latitude, longitude, activity, date));
                     //System.out.println(latitude + " " + longitude + " " + activity + " " + activity);
                     System.out.println("Done here");
                 }
@@ -125,10 +131,10 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
 
                 for (int i = 0; i < messageArray.length(); i++) {
                     JSONObject message = messageArray.getJSONObject(i);
-                    String userId = message.getString("userid");
+                    String username = message.getString("username");
                     String msg = message.getString("message");
-                    msgData.add(new MessageData(userId, msg));
-                    System.out.println("#### Message "+userId+" "+msg);
+                    msgData.add(new MessageData(username, msg));
+                    System.out.println("#### Message "+username+" "+msg);
                 }
                 ((MessageActivity)this.activity).setMessages(msgData);
             }
@@ -151,6 +157,13 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                 String ret = (String)jsonObject.getString("result");
                 System.out.println("#####  Result = "+ret);
                 ((CreateActivity)this.activity).creationCompleted(true);
+                //finish();
+            }
+            else if (type.equals("user")) {
+                //ArrayList<InterestData> interestData = new ArrayList<InterestData>();
+                String userid = (String)jsonObject.getJSONObject("userdetail").getString("userid");
+                System.out.println("#####  UserID = "+userid);
+                UserCredentials.setUserId(userid);
                 //finish();
             }
         } catch (Exception e) {

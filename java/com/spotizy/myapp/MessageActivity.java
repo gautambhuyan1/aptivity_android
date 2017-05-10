@@ -18,6 +18,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONObject;
+
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -40,12 +42,15 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
     private Intent intent;
     private GoogleMap mMap;
     private String date;
+    private String username;
+    private String userid;
     //private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("#####  Before Message Main");
         super.onCreate(savedInstanceState);
+        getUserContext();
         setContentView(R.layout.activity_detail);
         Intent triggerData = this.getIntent();
         if (triggerData != null) {
@@ -95,14 +100,18 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
             public void onClick(View v) {
                 String msg = message_content.getText().toString();
                 WebApiDataTask webDataFetcher = new WebApiDataTask(MessageActivity.this);
+                JSONObject postParams = new JSONObject();
+
                 try {
                     System.out.println("#####  URL : "+msg);
                     String urlTmp = URLEncoder.encode("\"" + msg + "\"", "utf-8");
                     System.out.println("#####  URL 1: "+urlTmp);
-                    LinkedHashMap<String,String> postParams=new LinkedHashMap<>();
+                    //LinkedHashMap<String,String> postParams=new LinkedHashMap<>();
                     postParams.put("activity", activityId);
+                    postParams.put("username", username);
+                    postParams.put("userid", userid);
                     postParams.put("message", msg);
-                    String postURL = ServerDataRetriever.createPostURL(postParams);
+                    String postURL = postParams.toString();//ServerDataRetriever.createPostURL(postParams);
 
                     //System.out.println("#### Messages: Onclick url = "+url);
                     webDataFetcher.execute("POST", "message", postURL);
@@ -145,8 +154,13 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
         this.messages = msgs;
         System.out.println("#####  setData::Messages");
         for (int i=0; i<msgs.size();i++) {
-            System.out.println(" Inside setMessages "+msgs.get(i).getUserId()+" "+msgs.get(i).getMessage());
+            System.out.println(" Inside setMessages "+msgs.get(i).getUserName()+" "+msgs.get(i).getMessage());
         }
         this.msgList.setAdapter(new MessageAdaptor(this, this.layoutIflator, this.messages));
+    }
+
+    private void getUserContext() {
+        username = UserCredentials.getUserName();
+        userid = UserCredentials.getUserId();
     }
 }
