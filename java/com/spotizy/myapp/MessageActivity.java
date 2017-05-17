@@ -88,7 +88,7 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
             //String url = "http://hospitopedia.com/message/get?activityid="+activityId+"&phone=%221234%22";
             //System.out.println("#### Messages: Onclick url = "+url);
             LinkedHashMap<String,String> getParams=new LinkedHashMap<>();
-            getParams.put("activity", activityId);
+            getParams.put("activityid", activityId);
             String getURL = ServerDataRetriever.createGetURL(getParams);
             webDataFetcher.execute("GET", "messages", getURL);
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
                     String urlTmp = URLEncoder.encode("\"" + msg + "\"", "utf-8");
                     System.out.println("#####  URL 1: "+urlTmp);
                     //LinkedHashMap<String,String> postParams=new LinkedHashMap<>();
-                    postParams.put("activity", activityId);
+                    postParams.put("activityid", activityId);
                     postParams.put("username", username);
                     postParams.put("userid", userid);
                     postParams.put("message", msg);
@@ -123,7 +123,7 @@ public class MessageActivity extends AppCompatActivity implements OnMapReadyCall
                     //String url = "http://hospitopedia.com/message/get?activityid="+activityId+"&phone=%221234%22";
                     //System.out.println("#### Messages: Onclick url = "+url);
                     LinkedHashMap<String,String> getParams=new LinkedHashMap<>();
-                    getParams.put("activity", activityId);
+                    getParams.put("activityid", activityId);
                     String getURL = ServerDataRetriever.createGetURL(getParams);
                     messageDataFetcher.execute("GET", "messages", getURL);
                 } catch (Exception e) {

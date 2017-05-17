@@ -27,8 +27,8 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
     }
 
     protected String doInBackground(String... str) {
-        String strURL = "https://gautambhuyan.herokuapp.com";
-        //String strURL = "http://10.10.10.219:5000";
+        //String strURL = "https://gautambhuyan.herokuapp.com";
+        String strURL = "http://10.0.0.4:5000";
         String method = str[0];
         String methodName = str[1];
         String params = str[2];
@@ -103,7 +103,7 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
             //JSONObject respJson = new JSONObject(result);
             JSONObject jsonObject = new JSONObject(result);//respJson.getJSONObject("object");
             String type = (String)jsonObject.getString("type");
-            if (type.equals("activity")) {
+            if (type.equals("activityget")) {
                 ArrayList<ActivityData> activityData = new ArrayList<ActivityData>();
                 JSONArray groupArray = jsonObject.getJSONArray("activities");
 
@@ -124,7 +124,7 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                 }
                 ((MainActivity)(this.activity)).setActivities(activityData);
             }
-            else if (type.equals("messages")) {
+            else if (type.equals("messageget")) {
                 ArrayList<MessageData> msgData = new ArrayList<MessageData>();
                 String activityId = jsonObject.getString("activityid");
                 JSONArray messageArray = jsonObject.getJSONArray("messages");
@@ -138,7 +138,7 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                 }
                 ((MessageActivity)this.activity).setMessages(msgData);
             }
-            else if (type.equals("interest")) {
+            else if (type.equals("interestget")) {
                 ArrayList<String> interestData = new ArrayList<String>();
                 String interestId;
                 JSONArray interestArray = jsonObject.getJSONArray("interests");
@@ -152,14 +152,14 @@ public class WebApiDataTask extends AsyncTask<String, Integer, String> {
                 }
                 ((MainActivity)this.activity).setInterests(interestData);
             }
-            else if (type.equals("create")) {
+            else if (type.equals("activitypost")) {
                 ArrayList<InterestData> interestData = new ArrayList<InterestData>();
                 String ret = (String)jsonObject.getString("result");
                 System.out.println("#####  Result = "+ret);
                 ((CreateActivity)this.activity).creationCompleted(true);
                 //finish();
             }
-            else if (type.equals("user")) {
+            else if (type.equals("userpost")) {
                 //ArrayList<InterestData> interestData = new ArrayList<InterestData>();
                 String userid = (String)jsonObject.getJSONObject("userdetail").getString("userid");
                 System.out.println("#####  UserID = "+userid);

@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
         //mPlaceAttribution = (TextView) findViewById(R.id.place_attribution);
 
-        interestSelected = "all";
+        interestSelected = "[\"all\"]";
 
         if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
 
@@ -204,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
 
                 interestSelected = interestList.getSelectedItem().toString();
+                interestSelected = "[\""+interestSelected+"\"]";
                 getActivitiesOnInterest(interestSelected);
 
             }
